@@ -45,6 +45,29 @@
     output {
       display: none;
     }
+
+    table {
+      inline-size: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 0.5rem;
+    }
+
+    th {
+      background: hsl(240deg 1% 80%);
+      text-transform: uppercase;
+    }
+
+    tbody tr:nth-child(odd) {
+      background: hsl(192deg 15% 94%);
+    }
+
+    tbody tr:nth-child(even) {
+      background: hsl(33deg 48% 85%);
+    }
   </style>
   <title>ens2hex</title>
 </head>
