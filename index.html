@@ -88,15 +88,11 @@
       return k.digest();
     }
 
-    const form = document.querySelector('form');
-    const div = document.querySelector('div');
-    const input = document.querySelector('input');
-    const output = document.querySelector('output');
-    const table = document.querySelector('table');
-
     // Implement drag and drop file upload
     window.addEventListener('dragover', e => e.preventDefault());
     window.addEventListener('drop', e => e.preventDefault());
+    const div = document.querySelector('div');
+    const input = document.querySelector('input');
     div.addEventListener('drop', e => input.files = e.dataTransfer.files);
     div.addEventListener('click', _ => input.click());
     input.addEventListener('click', e => e.stopPropagation()); // Prevent 'click' from getting propagated to div (or else there will be two dialogs)
@@ -116,7 +112,7 @@
       return [...hash].map(v => v.toString(16).padStart(2, '0')).join(''); // Convert byte array into 0-padded string. Must spread typed array into non-typed array to allow .map() to output strings
     }
 
-    form.addEventListener('submit', async event => {
+    document.querySelector('form').addEventListener('submit', async event => {
       event.preventDefault();
 
       const formData = new FormData(event.target);
@@ -143,6 +139,7 @@
         body: JSON.stringify(batchPayload),
       }).then(r => r.json());
 
+      const table = document.querySelector('table');
       table.querySelector('tbody')?.remove(); // Clear previous rows, if any
       const body = table.createTBody();
       for (const [index, name] of cleaned.entries()) {
@@ -155,7 +152,7 @@
         address.textContent = `0x${response.result.slice(26)}`;
       }
 
-      output.style.display = 'block';
+      document.querySelector('output').style.display = 'block';
     });
   </script>
 </body>
