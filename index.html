@@ -124,21 +124,18 @@
       const parsed = new Set(combined.split('\n').map(c => c.split(',')).flat().map(e => e.trim())); // Split on newline or comma, flatten, trim whitespace, de-duplicate
       const cleaned = [...parsed].filter(name => name.slice(-4) === '.eth'); // Remove anything that does not end in '.eth'
 
-      const batchPayload = [];
-      for (const [index, name] of cleaned.entries()) {
-        batchPayload.push({
-          jsonrpc: '2.0',
-          method: 'eth_call',
-          params: [
-            {
-              to: '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41', // ENS PublicResolver
-              data: `0x3b3b57de${namehash(name)}` // 0x3b3b57de is the byte signature for the function "addr(bytes32)" in ENS PublicResolver
-            },
-            'latest'
-          ],
-          id: index
-        });
-      }
+      const batchPayload = cleaned.map((name, index) => ({
+        jsonrpc: '2.0',
+        method: 'eth_call',
+        params: [
+          {
+            to: '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41', // ENS PublicResolver
+            data: `0x3b3b57de${namehash(name)}` // 0x3b3b57de is the byte signature for the function "addr(bytes32)" in ENS PublicResolver
+          },
+          'latest'
+        ],
+        id: index
+      }));
 
       const batchResponse = await fetch('https://cloudflare-eth.com/', {
         method: 'POST',
