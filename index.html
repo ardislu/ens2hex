@@ -148,12 +148,13 @@
 
       table.querySelector('tbody')?.remove(); // Clear previous rows, if any
       const body = table.createTBody();
-      for (const [index, response] of batchResponse.entries()) {
+      for (const [index, name] of cleaned.entries()) {
         const row = body.insertRow();
         const ens = row.insertCell();
         const address = row.insertCell();
 
-        ens.textContent = cleaned[index]; // Assumes batchResponse is in the same order as cleaned
+        ens.textContent = name;
+        const response = batchResponse.find(r => r.id === index);
         address.textContent = `0x${response.result.slice(26)}`;
       }
 
