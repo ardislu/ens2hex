@@ -135,6 +135,7 @@
     div.addEventListener('drop', e => input.files = e.dataTransfer.files);
     div.addEventListener('click', _ => input.click());
     input.addEventListener('click', e => e.stopPropagation()); // Prevent 'click' from getting propagated to div (or else there will be two dialogs)
+    document.querySelector('label[for="file"]').addEventListener('click', e => e.stopPropagation());
 
     // Implement namehash as defined in https://eips.ethereum.org/EIPS/eip-137
     // Does NOT include the '0x' prefix in the return value so it can be easily passed into JSON-RPC
