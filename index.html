@@ -5,18 +5,73 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:,">
+  <title>ens2hex</title>
   <style>
+    :root {
+      --primary: hsl(16deg 10% 60%);
+      --primary-lighter: hsl(16deg 40% 85%);
+      --primary-lightest: hsl(16deg 10% 90%);
+      --secondary: hsl(90deg 40% 35%);
+      --secondary-lighter: hsl(90deg 30% 80%);
+    }
+
     body {
       inline-size: min(100% - 16px, 720px);
       margin-inline: auto;
       font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
-      background: hsl(0deg 0% 90%);
+      background: var(--primary-lightest);
     }
 
     header {
       display: flex;
       justify-content: center;
-      align-items: center;
+    }
+
+    code {
+      background: var(--primary-lighter);
+      border-radius: 3px;
+      font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+      padding: 0 3px;
+    }
+
+    a {
+      color: var(--secondary);
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 500ms;
+    }
+
+    a:hover,
+    a:focus {
+      background: var(--secondary-lighter);
+      transition: background-color 150ms;
+    }
+
+    .about {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-block-end: 8px;
+    }
+
+    .about h1 {
+      margin: 0;
+    }
+
+    details {
+      border: 2px solid var(--secondary-lighter);
+      border-radius: 2px;
+    }
+
+    details summary {
+      background: var(--secondary-lighter);
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+
+    details .details-body {
+      padding: 8px 16px;
     }
 
     form {
@@ -29,12 +84,12 @@
       margin: 0;
     }
 
-    div {
+    .upload-box {
       display: flex;
       flex-direction: column;
       justify-content: center;
       padding: 20px;
-      border: 2px dashed hsl(0deg 0% 70%);
+      border: 2px dashed var(--primary);
       border-radius: 20px;
     }
 
@@ -58,7 +113,7 @@
     }
 
     th {
-      background: hsl(240deg 1% 80%);
+      background: var(--primary);
       text-transform: uppercase;
     }
 
@@ -73,14 +128,13 @@
     }
 
     tbody tr:nth-child(odd) {
-      background: hsl(192deg 15% 94%);
+      background: var(--primary-lighter);
     }
 
     tbody tr:nth-child(even) {
-      background: hsl(33deg 48% 85%);
+      background: var(--secondary-lighter);
     }
   </style>
-  <title>ens2hex</title>
 </head>
 
 <body>
@@ -89,44 +143,57 @@
   </header>
 
   <main>
-    <section>
+    <section class="about">
       <h1>About this site</h1>
       <details>
         <summary>What is this?</summary>
-        <p>This is a tool to get the <a href="https://ethereum.org">Ethereum</a> hexadecimal (<code>0x</code>) address for every <abbr title="Ethereum Name Service">ENS</abbr> (<code>.eth</code>) name in a list.</p>
+        <div class="details-body">
+          <p>This is a tool to get the <a href="https://ethereum.org">Ethereum</a> hexadecimal (<code>0x</code>) address for every <abbr title="Ethereum Name Service">ENS</abbr> (<code>.eth</code>) name in a list.</p>
+        </div>
       </details>
       <details>
         <summary>How does it work?</summary>
-        <p>This tool generates a <a href="https://ethereum.org/en/developers/docs/apis/json-rpc/">JSON-RPC</a> payload to bulk query the <a href="https://etherscan.io/address/0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41">ENS PublicResolver</a> smart contract, which returns the hexadecimal addresses.
-        <p>The <code>keccak256</code> implementation was taken from Deno (original code <a href="https://github.com/denoland/deno_std/tree/main/hash">here</a>).</p>
-        <p>There are no dependencies other than the <code>keccak256</code> implementation. The rest of the tool consists of about 80 lines of vanilla JavaScript.</p>
-        <p><a href="https://github.com/ardislu/ens2hex">Click here</a> to view the source code on GitHub.</p>
+        <div class="details-body">
+          <p>This tool generates a <a href="https://ethereum.org/en/developers/docs/apis/json-rpc/">JSON-RPC</a> request containing a payload to query the <a href="https://etherscan.io/address/0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41">ENS PublicResolver</a> smart contract for the hexadecimal addresses.</p>
+          <p>Then the tool sends the request to a <a href="https://ethereumnodes.com">public Ethereum node</a>, which executes the payload and provides a response.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Credits</summary>
+        <div class="details-body">
+          <p>There are no dependencies other than the <code>keccak256</code> implementation used to prepare the JSON-RPC payload. The rest of the tool consists of about 80 lines of vanilla JavaScript.</p>
+          <p>The <code>keccak256</code> implementation was taken from Deno (original code <a href="https://github.com/denoland/deno_std/tree/main/hash">here</a>).</p>
+          <p><a href="https://github.com/ardislu/ens2hex">Click here</a> to view this site's source code on GitHub.</p>
+        </div>
       </details>
     </section>
 
-    <form>
-      <label for="text">Copy a list of names here:</label>
-      <textarea id="text" name="text" rows="10"></textarea>
+    <section class="lookup">
+      <h1>ENS lookup</h1>
+      <form>
+        <label for="text">Copy a list of names here:</label>
+        <textarea id="text" name="text" rows="10"></textarea>
 
-      <p>Or upload a list of names:</p>
-      <div>
-        <label for="file">Drag and drop a file to upload, or</label>
-        <input id="file" type="file" name="file">
-      </div>
+        <p>Or upload a list of names:</p>
+        <div class="upload-box">
+          <label for="file">Drag and drop a file to upload, or</label>
+          <input id="file" type="file" name="file">
+        </div>
 
-      <button>Fetch addresses</button>
+        <button>Fetch addresses</button>
 
-      <output>
-        <table>
-          <thead>
-            <tr>
-              <th>ENS name</th>
-              <th>Address</th>
-            </tr>
-          </thead>
-        </table>
-      </output>
-    </form>
+        <output>
+          <table>
+            <thead>
+              <tr>
+                <th>ENS name</th>
+                <th>Address</th>
+              </tr>
+            </thead>
+          </table>
+        </output>
+      </form>
+    </section>
   </main>
 
   <script type="module">
@@ -141,10 +208,10 @@
     // Implement drag and drop file upload
     window.addEventListener('dragover', e => e.preventDefault());
     window.addEventListener('drop', e => e.preventDefault());
-    const div = document.querySelector('div');
+    const uploadBox = document.querySelector('.upload-box');
     const input = document.querySelector('input');
-    div.addEventListener('drop', e => input.files = e.dataTransfer.files);
-    div.addEventListener('click', _ => input.click());
+    uploadBox.addEventListener('drop', e => input.files = e.dataTransfer.files);
+    uploadBox.addEventListener('click', _ => input.click());
     input.addEventListener('click', e => e.stopPropagation()); // Prevent 'click' from getting propagated to div (or else there will be two dialogs)
     document.querySelector('label[for="file"]').addEventListener('click', e => e.stopPropagation());
 
