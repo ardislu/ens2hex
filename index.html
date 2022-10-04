@@ -84,12 +84,16 @@
       align-items: center;
       padding: 48px 16px;
       border: 2px dashed var(--primary);
-      border-radius: 20px;
+      border-radius: 12px;
     }
 
     .upload-box:hover,
     .upload-box label:hover {
       cursor: pointer;
+    }
+
+    .upload-box:has(input:focus) {
+      outline: -webkit-focus-ring-color auto 2px;
     }
 
     .upload-box input {
