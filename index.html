@@ -78,23 +78,30 @@
       padding: 8px 16px;
     }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    form p {
-      margin: 0;
-    }
-
     .upload-box {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 20px;
+      align-items: center;
+      padding: 40px 16px;
       border: 2px dashed var(--primary);
       border-radius: 20px;
+    }
+
+    .upload-box:hover,
+    .upload-box label:hover {
+      cursor: pointer;
+    }
+
+    .upload-box input {
+      opacity: 0;
+      width: 0.1px;
+      height: 0.1px;
+    }
+
+    #selected-file {
+      block-size: 1rem;
+      color: var(--secondary);
+      font-weight: 500;
     }
 
     button {
@@ -180,8 +187,9 @@
 
         <p>Or upload a list of names:</p>
         <div class="upload-box">
-          <label for="file">Drag and drop a file to upload, or</label>
+          <label for="file">Drag and drop a file to upload or click to choose a file.</label>
           <input id="file" type="file" name="file">
+          <p id="selected-file"></p>
         </div>
 
         <button>Fetch addresses</button>
@@ -214,10 +222,22 @@
     window.addEventListener('drop', e => e.preventDefault());
     const uploadBox = document.querySelector('.upload-box');
     const input = document.querySelector('input');
-    uploadBox.addEventListener('drop', e => input.files = e.dataTransfer.files);
+    uploadBox.addEventListener('drop', e => {
+      input.files = e.dataTransfer.files;
+      input.dispatchEvent(new Event('change'));
+    });
     uploadBox.addEventListener('click', _ => input.click());
     input.addEventListener('click', e => e.stopPropagation()); // Prevent 'click' from getting propagated to div (or else there will be two dialogs)
     document.querySelector('label[for="file"]').addEventListener('click', e => e.stopPropagation());
+    input.addEventListener('change', e => {
+      const { name, size } = e.target.files[0] ?? {};
+      if (name === undefined) {
+        document.querySelector('#selected-file').textContent = '';
+      }
+      else {
+        document.querySelector('#selected-file').textContent = `${name} (${size}B)`;
+      }
+    })
 
     // Implement namehash as defined in https://eips.ethereum.org/EIPS/eip-137
     // Does NOT include the '0x' prefix in the return value so it can be easily passed into JSON-RPC
