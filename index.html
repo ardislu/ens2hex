@@ -106,6 +106,20 @@
 
     button {
       inline-size: fit-content;
+      background: var(--secondary-lighter);
+      font-weight: 700;
+      padding: 16px;
+      border: 1px solid var(--secondary);
+      border-radius: 12px;
+      filter: brightness(0.95);
+      transition: filter 500ms;
+    }
+
+    button:hover,
+    button:focus {
+      cursor: pointer;
+      filter: brightness(1);
+      transition: filter 150ms;
     }
 
     output {
