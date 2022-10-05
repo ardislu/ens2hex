@@ -140,7 +140,7 @@
       transition: filter 150ms;
     }
 
-    output {
+    output#table {
       display: none;
     }
 
@@ -225,8 +225,9 @@
         </div>
 
         <button>Fetch addresses</button>
+        <output name="status" id="status"></output>
 
-        <output>
+        <output name="table" id="table">
           <table>
             <thead>
               <tr>
@@ -289,10 +290,16 @@
     document.querySelector('form').addEventListener('submit', async event => {
       event.preventDefault();
 
+      const status = event.target.elements['status'];
       const formData = new FormData(event.target);
       const combined = `${formData.get('text')}\n${await formData.get('file').text()}`; // Concatenate textarea and file inputs
       const parsed = new Set(combined.split('\n').map(c => c.split(',')).flat().map(e => e.trim())); // Split on newline or comma, flatten, trim whitespace, de-duplicate
       const cleaned = [...parsed].filter(name => name.slice(-4) === '.eth'); // Remove anything that does not end in '.eth'
+
+      if (cleaned.length === 0) {
+        status.textContent = 'No valid ENS names found.'
+        return;
+      }
 
       const batchPayload = cleaned.map((name, index) => ({
         jsonrpc: '2.0',
@@ -326,7 +333,7 @@
         address.textContent = `0x${response.result.slice(26)}`;
       }
 
-      document.querySelector('output').style.display = 'block';
+      document.querySelector('output#table').style.display = 'block';
     });
   </script>
 </body>
