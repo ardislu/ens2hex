@@ -328,7 +328,12 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(batchPayload),
-      }).then(r => r.json());
+      })
+        .then(r => r.json())
+        .catch(e => {
+          status.textContent = e;
+          return;
+        });
 
       const table = document.querySelector('table');
       table.querySelector('tbody')?.remove(); // Clear previous rows, if any
