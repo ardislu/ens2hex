@@ -299,6 +299,8 @@
       event.preventDefault();
 
       const status = event.target.elements['status'];
+      status.textContent = ''; // Clear previous status, if any
+
       const formData = new FormData(event.target);
       const combined = `${formData.get('text')}\n${await formData.get('file').text()}`; // Concatenate textarea and file inputs
       const parsed = new Set(combined.split('\n').map(c => c.split(',')).flat().map(e => e.trim())); // Split on newline or comma, flatten, trim whitespace, de-duplicate
