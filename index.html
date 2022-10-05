@@ -224,6 +224,14 @@
           <p id="selected-file"></p>
         </div>
 
+        <details>
+          <summary>Advanced options</summary>
+          <div class="details-body">
+            <label for="rpc">JSON-RPC node:</label>
+            <input type="url" name="rpc" id="rpc" value="https://cloudflare-eth.com" required>
+          </div>
+        </details>
+
         <button>Fetch addresses</button>
         <output name="status" id="status"></output>
 
@@ -297,7 +305,7 @@
       const cleaned = [...parsed].filter(name => name.slice(-4) === '.eth'); // Remove anything that does not end in '.eth'
 
       if (cleaned.length === 0) {
-        status.textContent = 'No valid ENS names found.'
+        status.textContent = 'No valid ENS names found.';
         return;
       }
 
@@ -314,7 +322,7 @@
         id: index
       }));
 
-      const batchResponse = await fetch('https://cloudflare-eth.com/', {
+      const batchResponse = await fetch(formData.get('rpc'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(batchPayload),
