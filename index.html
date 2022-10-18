@@ -46,6 +46,7 @@
       text-decoration: none;
       border-radius: 4px;
       transition: background-color 500ms;
+      transform: scaleY(0)
     }
 
     a:hover,
@@ -214,8 +215,9 @@
       <details>
         <summary>Credits</summary>
         <div class="details-body">
-          <p>There are no dependencies other than the <code>keccak256</code> implementation used to prepare the JSON-RPC payload. The rest of the tool consists of about 80 lines of vanilla JavaScript.</p>
-          <p>The <code>keccak256</code> implementation was taken from Deno (original code <a href="https://github.com/denoland/deno_std/tree/main/hash">here</a>).</p>
+          <p>This tool uses the public <a href="https://www.1rpc.io/">1RPC</a> Ethereum node to query the ENS smart contract on the Ethereum blockchain. <a href="https://ethereumnodes.com/">Click here</a> to see a list of some other public nodes you could use.</p>
+          <p>In the code, the only dependency is the <code>keccak256</code> implementation used to hash the ENS names. The rest of the tool consists of about 80 lines of vanilla JavaScript to manipulate the names and prepare the JSON-RPC payload.</p>
+          <p>The <code>keccak256</code> implementation was adapted from Deno (original code <a href="https://github.com/denoland/deno_std/tree/main/hash">here</a>).</p>
           <p><a href="https://github.com/ardislu/ens2hex">Click here</a> to view this site's source code on GitHub.</p>
         </div>
       </details>
