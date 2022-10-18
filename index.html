@@ -206,8 +206,9 @@
       <details>
         <summary>How does it work?</summary>
         <div class="details-body">
-          <p>This tool generates a <a href="https://ethereum.org/en/developers/docs/apis/json-rpc/">JSON-RPC</a> request containing a payload to query the <a href="https://etherscan.io/address/0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41">ENS PublicResolver</a> smart contract for the hexadecimal addresses.</p>
-          <p>Then the tool sends the request to a <a href="https://ethereumnodes.com">public Ethereum node</a>, which executes the payload and provides a response.</p>
+          <p>For each ENS name in the list, this tool will calculate the name's <code>namehash</code> according to <a href="https://eips.ethereum.org/EIPS/eip-137">EIP-137</a>.</p>
+          <p>Then it will prepare a <a href="https://ethereum.org/en/developers/docs/apis/json-rpc/">JSON-RPC</a> request containing a payload to query the <a href="https://etherscan.io/address/0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41">ENS PublicResolver</a> smart contract for the hexadecimal addresses.</p>
+          <p>Finally the tool sends the request to a <a href="https://www.1rpc.io/">public Ethereum node</a>, which executes the payload and provides a response.</p>
         </div>
       </details>
       <details>
