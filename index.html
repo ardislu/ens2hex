@@ -125,6 +125,17 @@
       height: 0.1px;
     }
 
+    .rpc-input-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .rpc-input-container input {
+      flex: 1 40ch;
+    }
+
     #selected-file {
       block-size: 1rem;
       color: var(--secondary);
@@ -238,7 +249,7 @@
 
         <details>
           <summary>Advanced options</summary>
-          <div class="details-body">
+          <div class="details-body rpc-input-container">
             <label for="rpc">JSON-RPC node:</label>
             <input type="url" name="rpc" id="rpc" value="https://eth.ardis.lu/v1/mainnet" required>
           </div>
