@@ -234,7 +234,7 @@
         <div class="details-body">
           <p>This tool uses <a href="https://developers.cloudflare.com/web3/">Cloudflare's Ethereum gateway</a> to query the ENS smart contract on the Ethereum blockchain. <a href="https://ethereumnodes.com/">Click here</a> or <a href="https://chainlist.org/chain/1">here</a> to see a list of some other public nodes you could use.</p>
           <p>In the JavaScript, the only third-party code is the <code>keccak256</code> implementation used to hash the ENS names. The rest of the tool consists of about 80 lines of vanilla JavaScript to manipulate the names and prepare the JSON-RPC payload.</p>
-          <p>The <code>keccak256</code> implementation was adapted from Deno (original code <a href="https://github.com/denoland/deno_std/tree/main/hash">here</a>).</p>
+          <p>The <code>keccak256</code> implementation was bundled from Paul Miller's <a href="https://github.com/paulmillr/noble-hashes">noble-hashes</a> project.</p>
           <p><a href="https://github.com/ardislu/ens2hex">Click here</a> to view this site's source code on GitHub.</p>
         </div>
       </details>
@@ -279,13 +279,8 @@
   </main>
 
   <script type="module">
-    import { Keccak256 } from './keccak256.js'; // Converted to JS from Deno's std/hash library
-
-    function keccak256(byteArray) {
-      const k = new Keccak256();
-      k.update(byteArray);
-      return k.digest();
-    }
+    // @noble/hashes v1.2.0
+    import { keccak_256 as keccak256 } from '/keccak256.js';
 
     // Implement drag and drop file upload
     window.addEventListener('dragover', e => e.preventDefault());
