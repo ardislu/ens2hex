@@ -327,7 +327,7 @@
 
       const formData = new FormData(event.target);
       const combined = `${formData.get('text')}\n${await formData.get('file').text()}`; // Concatenate textarea and file inputs
-      const parsed = new Set(combined.split('\n').map(c => c.split(',')).flat().map(e => e.trim())); // Split on newline or comma, flatten, trim whitespace, de-duplicate
+      const parsed = new Set(combined.split('\n').map(c => c.split(',')).flat().map(e => e.trim().toLocaleLowerCase())); // Split on newline or comma, flatten, trim whitespace, lowercase, and de-duplicate
       const cleaned = [...parsed].filter(name => name.slice(-4) === '.eth'); // Remove anything that does not end in '.eth'
 
       if (cleaned.length === 0) {
