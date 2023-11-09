@@ -167,7 +167,7 @@
       transition: filter 150ms;
     }
 
-    #fetch:disabled {
+    [data-submitting] #fetch {
       cursor: not-allowed;
       filter: brightness(0.9);
     }
@@ -380,7 +380,10 @@
     document.querySelector('form').addEventListener('submit', async event => {
       event.preventDefault();
 
-      event.submitter.disabled = true;
+      if (event.target.hasAttribute('data-submitting')) {
+        return;
+      }
+      event.target.setAttribute('data-submitting', '');
       const spinner = document.querySelector('.inline-spinner');
       spinner.style.setProperty('display', 'inline-block');
 
@@ -434,9 +437,9 @@
         address.textContent = `0x${response.result.slice(26)}`;
       }
 
-      event.submitter.disabled = false;
       spinner.style.setProperty('display', 'none');
       document.querySelector('output#table').style.display = 'block';
+      event.target.removeAttribute('data-submitting');
     });
 
     // Download to CSV
