@@ -397,6 +397,8 @@
 
       if (cleaned.length === 0) {
         status.textContent = 'No valid ENS names found.';
+        spinner.style.setProperty('display', 'none');
+        event.target.removeAttribute('data-submitting');
         return;
       }
 
