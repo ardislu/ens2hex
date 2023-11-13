@@ -193,22 +193,26 @@
 
     output#table {
       display: none;
-      position: relative;
     }
 
     #download {
       cursor: pointer;
-      position: absolute;
-      top: 8px;
-      right: 8px;
       background: none;
       border: none;
       padding: 0;
       transition: filter 400ms;
     }
 
+    label[for="download"] {
+      cursor: pointer;
+      display: inline-block;
+      color: var(--secondary);
+      font-weight: 500;
+      transform: translateY(-5px);
+    }
+
     #download:is(:hover, :focus) {
-      filter: drop-shadow(0 0 8px var(--secondary-lighter));
+      filter: drop-shadow(0 0 8px var(--secondary));
       transition: filter 200ms;
     }
 
@@ -323,6 +327,7 @@
               <path d="m9 15 3 3 3-3"></path>
             </svg>
           </button>
+          <label for="download">Download to CSV file</label>
           <table>
             <thead>
               <tr>
