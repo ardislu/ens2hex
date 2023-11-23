@@ -6,7 +6,7 @@ The keccak256 implementation is from Paul Miller's [noble-hashes](https://github
 
 ## Hardcoded ENS resolvers
 
-> ![WARNING]<br>
+> [!WARNING]<br>
 > This tool will report an address of `0x0000000000000000000000000000000000000000` for ENS names that do not have an address set, or that use a custom ENS resolver.
 
 The [official method of resolving an ENS name](https://docs.ens.domains/dapp-developer-guide/resolving-names) requires (1) getting the ENS resolver for the name, then (2) asking the resolver for the name's address.
