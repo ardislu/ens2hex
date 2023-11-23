@@ -275,7 +275,7 @@
         <summary>How does it work?</summary>
         <div class="details-body">
           <p>For each ENS name in the list, this tool will calculate the name's <code>namehash</code> according to <a href="https://eips.ethereum.org/EIPS/eip-137">EIP-137</a>.</p>
-          <p>Then it will prepare a <a href="https://ethereum.org/en/developers/docs/apis/json-rpc/">JSON-RPC</a> request containing a payload to query the <a href="https://etherscan.io/address/0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41">ENS PublicResolver</a> smart contract for the hexadecimal addresses.</p>
+          <p>Then it will prepare a <a href="https://ethereum.org/en/developers/docs/apis/json-rpc/">JSON-RPC</a> request to query the <a href="https://www.multicall3.com/"><code>multicall3</code></a> smart contract, which in turn contains a batched call to the <a href="https://etherscan.io/address/0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41">ENS PublicResolver</a> smart contract for the hexadecimal addresses.</p>
           <p>Finally the tool sends the request to an <a href="https://ethereum.org/en/developers/docs/nodes-and-clients/">Ethereum node</a>, which executes the payload and provides a response.</p>
         </div>
       </details>
@@ -383,6 +383,54 @@
       return [...hash].map(v => v.toString(16).padStart(2, '0')).join(''); // Convert byte array into 0-padded string. Must spread typed array into non-typed array to allow .map() to output strings
     }
 
+    // Batch multiple "addr(bytes32)" calls to ENS Public Resolver using the multicall3 smart contract
+    async function multicall(rpc, names) {
+      // Construct payload
+      const multiCallPrefix =
+        '0x82ad56cb' + // aggregate3((address,bool,bytes)[])
+        '20'.padStart(64, '0') + // Pointer to next calldata slot
+        names.length.toString(16).padStart(64, '0'); // Length of tuple
+
+      let multiCallTupleOffsets = '';
+      let multiCallTuples = '';
+      for (const [index, name] of names.entries()) {
+        // Each tuple takes exactly 6 32-byte slots, starting after these offsets themselves end
+        multiCallTupleOffsets += ((6 * 32 * index) + (names.length * 32)).toString(16).padStart(64, '0');
+        multiCallTuples +=
+          '4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41'.padStart(64, '0') + // ENS PublicResolver
+          '0'.repeat(64) + // Hardcode allowFailure = false
+          '60'.padStart(64, '0') + // Pointer to next calldata slot
+          '24'.padStart(64, '0') + // 0x24 == 36 bytes immediately follow
+          `3b3b57de${namehash(name)}`.padEnd(64 * 2, '0'); // Calldata for "addr(bytes32)", filling 2 slots
+      }
+
+      const response = await fetch(rpc, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'eth_call',
+          params: [
+            {
+              to: '0xcA11bde05977b3631167028862bE2a173976CA11', // multicall3
+              data: multiCallPrefix + multiCallTupleOffsets + multiCallTuples
+            },
+            'safe'
+          ],
+          id: 'multicall'
+        }),
+      }).then(r => r.json());
+
+      const addresses = {};
+      for (const [index, name] of names.entries()) {
+        const prefixOffset = 64 * (2 + names.length); // First 2 slots encode struct offset and length, then 1 slot for the offset of each result
+        const payloadOffset = 64 * (3 + index * 4); // First 3 slots of each result is multicall overhead, actual result starts in slot 4
+        const totalOffset = prefixOffset + payloadOffset;
+        addresses[name] = `0x${response.result.slice(totalOffset + 26, totalOffset + 66)}`; // Parse address from slot 4
+      }
+      return addresses;
+    }
+
     document.querySelector('form').addEventListener('submit', async event => {
       event.preventDefault();
 
@@ -408,25 +456,7 @@
         return;
       }
 
-      const batchPayload = cleaned.map((name, index) => ({
-        jsonrpc: '2.0',
-        method: 'eth_call',
-        params: [
-          {
-            to: '0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41', // ENS PublicResolver
-            data: `0x3b3b57de${namehash(name)}` // 0x3b3b57de is the byte signature for the function "addr(bytes32)" in ENS PublicResolver
-          },
-          'safe'
-        ],
-        id: index
-      }));
-
-      const batchResponse = await fetch(formData.get('rpc'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(batchPayload),
-      })
-        .then(r => r.json())
+      const multicallResponse = await multicall(formData.get('rpc'), cleaned)
         .catch(e => {
           status.textContent = e;
           return;
@@ -435,14 +465,14 @@
       const table = document.querySelector('table');
       table.querySelector('tbody')?.remove(); // Clear previous rows, if any
       const body = table.createTBody();
-      for (const [index, name] of cleaned.entries()) {
+      for (const name of cleaned) {
         const row = body.insertRow();
         const ens = row.insertCell();
         const address = row.insertCell();
 
         ens.textContent = name;
-        const response = batchResponse.find(r => r.id === index);
-        address.textContent = `0x${response.result.slice(26)}`;
+        const response = multicallResponse[name];
+        address.textContent = response;
       }
 
       spinner.style.setProperty('display', 'none');
