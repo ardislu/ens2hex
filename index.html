@@ -15,6 +15,7 @@
   <title>ens2hex</title>
   <style>
     :root {
+      --primary-darker: hsl(16deg 30% 40%);
       --primary: hsl(16deg 10% 60%);
       --primary-lighter: hsl(16deg 40% 85%);
       --primary-lightest: hsl(16deg 10% 90%);
@@ -116,6 +117,13 @@
       padding: 48px 16px;
       border: 2px dashed var(--primary);
       border-radius: 12px;
+      transition: border-color 400ms;
+    }
+
+    .upload-box:hover,
+    .upload-box[data-dragover] {
+      border-color: var(--primary-darker);
+      transition: border-color 200ms;
     }
 
     .upload-box:hover,
@@ -353,10 +361,13 @@
     window.addEventListener('drop', e => e.preventDefault());
     const uploadBox = document.querySelector('.upload-box');
     const input = document.querySelector('input');
+    uploadBox.addEventListener('dragenter', () => uploadBox.setAttribute('data-dragover', ''));
     uploadBox.addEventListener('drop', e => {
       input.files = e.dataTransfer.files;
       input.dispatchEvent(new Event('change'));
+      uploadBox.dispatchEvent(new Event('dragleave'));
     });
+    uploadBox.addEventListener('dragleave', () => uploadBox.removeAttribute('data-dragover'));
     uploadBox.addEventListener('click', _ => input.click());
     input.addEventListener('click', e => e.stopPropagation()); // Prevent 'click' from getting propagated to div (or else there will be two dialogs)
     document.querySelector('label[for="file"]').addEventListener('click', e => e.stopPropagation());
