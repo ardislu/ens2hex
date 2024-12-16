@@ -141,15 +141,15 @@
       height: 0.1px;
     }
 
-    .rpc-input-container {
+    .inline-input-container {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
       gap: 8px;
     }
 
-    .rpc-input-container input {
-      flex: 1 40ch;
+    .inline-input-container input {
+      flex-grow: 1;
     }
 
     #selected-file {
@@ -287,6 +287,7 @@
           <p>For each ENS name in the list, this tool will calculate the name's <code>namehash</code> according to <a href="https://ercs.ethereum.org/ERCS/erc-137">ERC-137</a>.</p>
           <p>Then it will prepare a <a href="https://ethereum.org/en/developers/docs/apis/json-rpc/">JSON-RPC</a> request to query the <a href="https://www.multicall3.com/"><code>multicall3</code></a> smart contract, which in turn contains batched calls to the <a href="https://etherscan.io/address/0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41">ENS Public Resolver 2</a> and the <a href="https://etherscan.io/address/0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8">Old ENS Public Resolver 2</a> smart contracts for the hexadecimal addresses.</p>
           <p>Finally the tool sends the request to an <a href="https://ethereum.org/en/developers/docs/nodes-and-clients/">Ethereum node</a>, which executes the payload and provides a response.</p>
+          <p>Note that the <code>multicall3</code> smart contract was deployed in <a href="https://etherscan.io/tx/0x00d9fcb7848f6f6b0aae4fb709c133d69262b902156c85a473ef23faa60760bd">block number 14353601</a>, so <code>14353601</code> is the oldest block that can be queried.</p>
         </div>
       </details>
       <details>
@@ -315,9 +316,13 @@
 
         <details>
           <summary>Advanced options</summary>
-          <div class="details-body rpc-input-container">
+          <div class="details-body inline-input-container">
             <label for="rpc">JSON-RPC node:</label>
             <input type="url" name="rpc" id="rpc" value="https://eth.ardis.lu/v1/mainnet" required>
+          </div>
+          <div class="details-body inline-input-container">
+            <label for="block">Block number (empty value will default to "latest"):</label>
+            <input type="number" name="block" id="block" min="14353601" placeholder="21413499">
           </div>
         </details>
 
@@ -397,7 +402,11 @@
     }
 
     // Batch multiple "addr(bytes32)" calls to both "ENS Public Resolver 2" AND "Old ENS Public Resolver 2" using the multicall3 smart contract
-    async function multicall(rpc, names) {
+    async function multicall(rpc, names, block) {
+      if (block !== 'latest') {
+        block = `0x${block.toString(16)}`;
+      }
+
       // Construct payload
       const multiCallPrefix =
         '0x82ad56cb' + // aggregate3((address,bool,bytes)[])
@@ -435,7 +444,7 @@
               to: '0xcA11bde05977b3631167028862bE2a173976CA11', // multicall3
               data: multiCallPrefix + multiCallTupleOffsets + multiCallTuples1
             },
-            'safe'
+            block
           ],
           id: 'new'
         },
@@ -447,7 +456,7 @@
               to: '0xcA11bde05977b3631167028862bE2a173976CA11', // multicall3
               data: multiCallPrefix + multiCallTupleOffsets + multiCallTuples2
             },
-            'safe'
+            block
           ],
           id: 'old'
         }]),
@@ -498,6 +507,7 @@
       status.textContent = ''; // Clear previous status, if any
 
       const formData = new FormData(event.target);
+      const block = formData.get('block') === '' ? 'latest' : Number(formData.get('block'));
       const combined = `${formData.get('text')}\n${await formData.get('file').text()}`; // Concatenate textarea and file inputs
       const parsed = new Set(combined.split('\n').map(c => c.split(',')).flat().map(e => e.trim().toLocaleLowerCase())); // Split on newline or comma, flatten, trim whitespace, lowercase, and de-duplicate
       const cleaned = [...parsed].filter(name => name.slice(-4) === '.eth'); // Remove anything that does not end in '.eth'
@@ -509,7 +519,7 @@
         return;
       }
 
-      const multicallResponse = await multicall(formData.get('rpc'), cleaned)
+      const multicallResponse = await multicall(formData.get('rpc'), cleaned, block)
         .catch(e => {
           status.textContent = e;
           return;
