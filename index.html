@@ -510,7 +510,7 @@
       const block = formData.get('block') === '' ? 'latest' : Number(formData.get('block'));
       const combined = `${formData.get('text')}\n${await formData.get('file').text()}`; // Concatenate textarea and file inputs
       const parsed = new Set(combined.split('\n').map(c => c.split(',')).flat().map(e => e.trim().toLocaleLowerCase())); // Split on newline or comma, flatten, trim whitespace, lowercase, and de-duplicate
-      const cleaned = [...parsed].filter(name => name.slice(-4) === '.eth'); // Remove anything that does not end in '.eth'
+      const cleaned = [...parsed].filter(name => name.includes('.')); // Remove anything that does not have a dot, names must have at least one
 
       if (cleaned.length === 0) {
         status.textContent = 'No valid ENS names found.';
