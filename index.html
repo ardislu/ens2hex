@@ -22,6 +22,7 @@
       --secondary: hsl(90deg 40% 35%);
       --secondary-lighter: hsl(90deg 30% 80%);
       --secondary-lightest: hsl(90deg 5% 90%);
+      interpolate-size: allow-keywords;
     }
 
     body {
@@ -91,6 +92,16 @@
     details {
       border: 2px solid var(--secondary-lighter);
       border-radius: 2px;
+    }
+
+    details::details-content {
+      transition: block-size 200ms ease, content-visibility 200ms ease allow-discrete;
+      block-size: 0;
+      overflow: clip;
+    }
+
+    details[open]::details-content {
+      block-size: auto;
     }
 
     summary {
