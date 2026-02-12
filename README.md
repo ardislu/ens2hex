@@ -4,6 +4,8 @@ Minimal website to look up the Ethereum hexadecimal (`0x`) address for every [EN
 
 The keccak256 implementation is from Paul Miller's [noble-hashes](https://github.com/paulmillr/noble-hashes) library.
 
+Code repository mirrors: [GitHub](https://github.com/ardislu/ens2hex), [Codeberg](https://codeberg.org/ardislu/ens2hex), [git.ardis.lu](https://git.ardis.lu/ens2hex)
+
 ## Hardcoded ENS resolvers
 
 > [!WARNING]<br>
